@@ -2,17 +2,13 @@
 # This script displays different messages for each loop iteration.
 
 count=1
-while [ $count -le 10 ]; do
-  case $count in
-    4)
-      echo "bad luck"
-      ;;
-    8)
-      echo "good luck"
-      ;;
-    *)
-      echo "Best School"
-      ;;
-  esac
+while ((count <= 10)); do
+  if ((count == 4)); then
+    echo "bad luck"
+  elif ((count == 8)); then
+    echo "good luck"
+  else
+    echo "Best School"
+  fi
   ((count++))
 done
