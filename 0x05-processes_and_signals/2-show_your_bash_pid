@@ -3,4 +3,4 @@
 # shellcheck disable=SC2009
 
 # Use ps command to find the PID of the Bash process and filter lines containing 'bash'
-ps aux --forest | grep bash
+ps -auxf | grep bash
