@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+#Bash script that pings another address enterd over 5 times
+[ $# -ne 0 ] && ping -c 5 "$1"
