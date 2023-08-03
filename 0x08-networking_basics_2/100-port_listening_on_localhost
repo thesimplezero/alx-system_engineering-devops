@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+# Listen on port 98 of localhost using 'nc' (netcat).
+# When executed, this script waits for incoming data on port 98 and displays it.
+# Test by connecting to the port in another terminal:
+
+nc -l localhost 98

@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# A script to get the machine's IP address
+
+# Function to get the machine's IP address
+get_ip_address() {
+    local ip_address
+    if command -v ip &>/dev/null; then
+        ip_address=$(ip addr show | grep -oP 'inet \K[\d.]+')
+    elif command -v ifconfig &>/dev/null; then
+        ip_address=$(ifconfig | grep -Eo "inet (addr:)?([0-9]*\.){3}[0-9]*" | cut -b 11-)
+    else
+        echo "Error: Unable to determine IP address. 'ip' or 'ifconfig' command not found." >&2
+        exit 1
+    fi
+    echo "$ip_address"
+}
+
+# Call the get_ip_address function to retrieve the IP address
+machine_ip=$(get_ip_address)
+echo "$machine_ip"
