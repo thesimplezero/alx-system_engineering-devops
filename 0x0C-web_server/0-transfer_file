@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Check the number of command-line arguments provided
+if [ $# -lt 4 ]; then
+    # If fewer than 4 arguments are provided, display usage instructions
+    echo "Usage: $0 PATH_TO_FILE IP USERNAME PATH_TO_SSH_KEY"
+else
+    # If at least 4 arguments are provided, proceed with file transfer using scp
+
+    # Set options for scp:
+    # -o StrictHostKeyChecking=no: Disable strict host key checking
+    # -i "$4": Specify the path to the SSH private key
+    # "$1": Source file to transfer
+    # "$3@$2": Destination in the format USERNAME@IP
+    # ":~": Destination directory (user's home directory)
+    scp -o StrictHostKeyChecking=no -i "$4" "$1" "$3@$2":~
+fi
