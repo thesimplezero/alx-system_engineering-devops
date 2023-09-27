@@ -1,9 +1,5 @@
-#!/use/bin/env bash
+#!/usr/bin/env bash
+# Debug a webstack application
 
-# echo "ServerName localhost" >> /etc/apache2.conf
-# service apache2 restart
-# service apache2 status
-
-# starting the apache server
-
-service apache2 start
+echo "ServerName localhost" >> /etc/apache2/apache2.conf
+sudo /etc/init.d/apache2 start
