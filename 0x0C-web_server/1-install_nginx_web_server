@@ -12,7 +12,7 @@ sudo apt-get -y install nginx
 sudo ufw allow 'Nginx HTTP'
 
 # Create a simple HTML file with "Hello, world!" content and place it in the default web directory
-echo "Hello, world!" | sudo tee /var/www/html/index.html
+echo "Hello world!" | sudo tee /var/www/html/index.html
 
 # Restart the Nginx service to apply the changes
 sudo service nginx restart
