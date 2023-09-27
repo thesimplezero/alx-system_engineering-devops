@@ -1,5 +1,9 @@
 #!/use/bin/env bash
 
-echo "ServerName localhost" >> /etc/apache2.conf
-service apache2 restart
-service apache2 status
+# echo "ServerName localhost" >> /etc/apache2.conf
+# service apache2 restart
+# service apache2 status
+
+# starting the apache server
+
+service apache2 start
