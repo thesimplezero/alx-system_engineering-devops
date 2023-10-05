@@ -5,25 +5,36 @@ print_info() {
     local domain="$1"
     local subdomain="$2"
 
-    local dns_info
-    dns_info=$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1)
+    if [ -n "$subdomain" ]; then
+        # If subdomain is provided, display information for the specified subdomain
+        local dns_info
+        dns_info=$(dig "$subdomain.$domain" | grep -A1 'ANSWER SECTION:' | tail -1)
 
-    local subdomain_name
-    subdomain_name=$(echo "$dns_info" | awk '{print $1}')
-    local record_type
-    record_type=$(echo "$dns_info" | awk '{print $4}')
-    local destination
-    destination=$(echo "$dns_info" | awk '{print $5}')
+        local subdomain_name
+        subdomain_name=$(echo "$dns_info" | awk '{print $1}')
+        local record_type
+        record_type=$(echo "$dns_info" | awk '{print $4}')
+        local destination
+        destination=$(echo "$dns_info" | awk '{print $5}')
 
-    echo "The subdomain $subdomain_name is a $record_type record and points to $destination"
+        echo "The subdomain $subdomain_name is a $record_type record and points to $destination"
+    else
+        # If only domain is provided, display information for predefined subdomains
+        local subdomains=("www" "lb-01" "web-01" "web-02")
+        for sub in "${subdomains[@]}"; do
+            print_info "$domain" "$sub"
+        done
+    fi
 }
 
-# Check the number of arguments provided
+# Check if both domain and subdomain are provided as arguments
 if [ "$#" -eq 2 ]; then
     print_info "$1" "$2"
 else
-    subdomains=("www" "lb-01" "web-01" "web-02")
-    for subdomain in "${subdomains[@]}"; do
-        print_info "$1" "$subdomain"
-    done
+    if [ "$#" -eq 1 ]; then
+        # If only domain is provided, display information for predefined subdomains
+        print_info "$1"
+    else
+        echo "Usage: $0 <domain> [subdomain]"
+    fi
 fi
