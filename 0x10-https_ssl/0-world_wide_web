@@ -1,42 +1,35 @@
 #!/usr/bin/env bash
-# Usage info
-usage() {
-  echo "Usage: $0 <domain> [subdomain]" 
-  echo "Displays DNS record info for subdomains of given domain"
-  exit 1
+# Script displays information about subdomains of given domain.
+
+# Function to query DNS and display information
+query_dns() {
+    subdomain="$1"
+    domain="$2"
+    result=$(dig +short "$subdomain.$domain")
+
+    if [ -z "$result" ]; then
+        echo "The subdomain $subdomain does not exist for domain $domain."
+    else
+        record_type=$(dig +short -t "$subdomain" "$domain")
+        echo "The subdomain $subdomain is a $record_type record and points to $result"
+    fi
 }
 
-# Check domain argument provided
-if [ $# -eq 0 ]; then
-  usage
+# Check for correct number of arguments
+if [ "$#" -lt 1 ] || [ "$#" -gt 2 ]; then
+    echo "Usage: $0 <domain> [subdomain]"
+    exit 1
 fi
 
-# Set domain 
-domain=$1
+# Set default subdomains to check
+subdomains=("www" "lb-01" "web-01" "web-02")
 
-# Function to display subdomain info
-display_record() {
-  subdomain=$1
-  
-  # Lookup IP for subdomain  
-  ip=$(dig +short ${subdomain}.${domain} | awk '{print $1}')
-  
-  # Lookup record type 
-  type=$(dig ${subdomain}.${domain} +noall +answer | awk '{print $4}')
-
-  # Print output
-  echo "The subdomain ${subdomain} is a ${type} record and points to ${ip}"
-}
-
-# If only domain provided, loop through standard subdomains
-if [ $# -eq 1 ]; then
-  display_record www
-  display_record lb-01
-  display_record web-01
-  display_record web-02
-
-# If subdomain provided, display for just that  
+# If subdomain is provided as an argument, query only that subdomain
+if [ "$#" -eq 2 ]; then
+    query_dns "$2" "$1"
 else
-  subdomain=$2
-  display_record $subdomain
+    # If only domain is provided, query the default subdomains
+    for subdomain in "${subdomains[@]}"; do
+        query_dns "$subdomain" "$1"
+    done
 fi
