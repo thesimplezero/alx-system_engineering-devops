@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Configure Nginx to listen on port 80.
+sudo ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+# Start the Nginx service.
+sudo service nginx start
+# Kill the first Nginx process to ensure a clean restart.
+sudo kill "$(pgrep 'nginx' | head -1)"
