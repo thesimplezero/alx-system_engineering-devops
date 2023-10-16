@@ -2,11 +2,19 @@
 # Configure ufw firewall to block incoming traffic
 # except for TCP ports 22, 80, 443
 
-sudo apt install ufw
+# Install ufw if not already installed
+sudo apt install -y ufw
+
+# Enable the firewall and set default policies
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
+
+# Allow specific TCP ports
 sudo ufw allow 22/tcp
-sudo ufw allow 443/tcp
 sudo ufw allow 80/tcp
-sudo ufw enable
+sudo ufw allow 443/tcp
+
+# Enable the firewall and display status
+sudo ufw --force enable
 sudo ufw status verbose
+
