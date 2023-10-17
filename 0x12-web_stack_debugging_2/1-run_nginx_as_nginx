@@ -6,24 +6,24 @@ if [ "$(id -u)" -ne 0 ]; then
   exit 1
 fi
 
-# Check if Nginx is installed
+# Ensure Nginx is installed
 if ! [ -x "$(command -v nginx)" ]; then
   echo "Nginx is not installed. Please install Nginx first."
   exit 1
 fi
 
-# Stop Nginx service if it's running
+# Stop the Nginx service if it's running
 if systemctl is-active --quiet nginx; then
   systemctl stop nginx
 fi
 
-# Modify Nginx configuration file to run as nginx user
-sed -i 's/user www-data/user nginx/' /etc/nginx/nginx.conf
+# Modify the Nginx configuration to run as the nginx user
+sed -i 's/user  nginx;/user nginx;/' /etc/nginx/nginx.conf
 
-# Modify default site configuration to listen on port 8080
-sed -i 's/listen 80/listen 8080/' /etc/nginx/sites-available/default
+# Modify the default site configuration to listen on all active IPs on port 8080
+sed -i 's/listen 80;/listen *:8080;/' /etc/nginx/sites-available/default
 
-# Test Nginx configuration
+# Test the Nginx configuration
 if nginx -t; then
   # Reload Nginx if the configuration is valid
   systemctl reload nginx
@@ -32,9 +32,17 @@ else
   exit 1
 fi
 
-# Verify changes
-if nc -z 0 8080; then
+# Verify that Nginx is running as the nginx user
+if ps aux | grep "nginx: worker process" | grep -q "nginx"; then
+  echo "Nginx is running as the nginx user."
+else
+  echo "Nginx is not running as the nginx user. Please check your configuration."
+fi
+
+# Verify that Nginx is listening on port 8080
+if nc -z -w 2 0 8080; then
   echo "Nginx is listening on port 8080."
 else
   echo "Nginx is not listening on port 8080. Please check your configuration."
 fi
+
