@@ -1,48 +1,15 @@
 #!/usr/bin/env bash
+# Change the Nginx user from 'www-data' to 'nginx' in the Nginx configuration file.
+sed -i "s/#user www-data/user nginx/" /etc/nginx/nginx.conf
 
-# Check if the script is being run as root
-if [ "$(id -u)" -ne 0 ]; then
-  echo "This script must be run as root."
-  exit 1
-fi
+# Modify the default Nginx site configuration to listen on port 8080 instead of port 80.
+sed -i "s/80/8080/g" /etc/nginx/sites-available/default
 
-# Ensure Nginx is installed
-if ! [ -x "$(command -v nginx)" ]; then
-  echo "Nginx is not installed. Please install Nginx first."
-  exit 1
-fi
+# Set the permissions for the Nginx configuration file to 644 (readable by owner and group).
+chmod 644 /etc/nginx/nginx.conf
 
-# Stop the Nginx service if it's running
-if systemctl is-active --quiet nginx; then
-  systemctl stop nginx
-fi
+# Terminate any running Apache processes (assuming you're switching from Apache to Nginx).
+pkill apache2
 
-# Modify the Nginx configuration to run as the nginx user
-sed -i 's/user  nginx;/user nginx;/' /etc/nginx/nginx.conf
-
-# Modify the default site configuration to listen on all active IPs on port 8080
-sed -i 's/listen 80;/listen *:8080;/' /etc/nginx/sites-available/default
-
-# Test the Nginx configuration
-if nginx -t; then
-  # Reload Nginx if the configuration is valid
-  systemctl reload nginx
-else
-  echo "Nginx configuration is invalid. Please check your configuration files."
-  exit 1
-fi
-
-# Verify that Nginx is running as the nginx user
-if ps aux | grep "nginx: worker process" | grep -q "nginx"; then
-  echo "Nginx is running as the nginx user."
-else
-  echo "Nginx is not running as the nginx user. Please check your configuration."
-fi
-
-# Verify that Nginx is listening on port 8080
-if nc -z -w 2 0 8080; then
-  echo "Nginx is listening on port 8080."
-else
-  echo "Nginx is not listening on port 8080. Please check your configuration."
-fi
-
+# Start the Nginx service with the 'nginx' user.
+sudo -u nginx service nginx start
