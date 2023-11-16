@@ -1,0 +1,50 @@
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    # Rewrite specific path to a different URL
+    rewrite ^/redirect_me https://www.youtube.com/ permanent;
+
+    # Use the server's IP address as the domain name
+    server_name 54.87.994.2;
+
+    # Add a custom HTTP response header
+    add_header X-Served-By 228560-web-01;
+
+    # Define the document root for the server
+    root /var/www/html;
+
+    # Set the default index files
+    index index.html index.htm index.nginx-debian.html;
+
+    # Define a catch-all server name for errors
+    server_name _;
+
+    # Specify the error page for 404 errors
+    error_page 404 /404.html;
+
+    # Define the internal location for the custom 404 error page
+    location = /404.html {
+        internal;
+    }
+
+    # Proxy requests to the specified route on the Flask application running on port 5000
+    location /airbnb-onepage/ {
+        proxy_pass http://127.0.0.1:5000/airbnb-onepage/;
+    }
+
+    # Proxy requests to the route for odd or even numbers on Gunicorn running on port 5001
+    location ~ ^/airbnb-dynamic/number_odd_or_even/(\d+)$ {
+        proxy_pass http://127.0.0.1:5001/airbnb-dynamic/number_odd_or_even/$1;
+    }
+
+    # Serve static files from the specified directory
+    location /hbnb_static/ {
+        alias /data/web_static/current/;
+    }
+
+    # Define the location block for the default route
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
