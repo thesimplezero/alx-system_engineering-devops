@@ -1,0 +1,62 @@
+server {
+    # Listen on port 80 for both IPv4 and IPv6
+    listen 80 default_server;
+    listen [::]:80 default_server;
+
+    # Rewrite specific path to a different URL
+    rewrite ^/redirect_me https://www.youtube.com/ permanent;
+
+    # Use the server's IP address as the domain name
+    server_name 54.208.71.253;
+
+    # Add a custom HTTP response header
+    add_header X-Served-By 256900-web-01;
+
+    # Define the document root for the server
+    root /var/www/html;
+
+    # Set the default index files
+    index index.html index.htm index.nginx-debian.html;
+
+    # Define a catch-all server name for errors
+    server_name _;
+
+    # Specify the error page for 404 errors
+    error_page 404 /404.html;
+
+    # Define the internal location for the custom 404 error page
+    location = /404.html {
+        internal;
+    }
+
+    # Proxy requests to the specified route on the Flask application
+    location = /airbnb-onepage/ {
+        proxy_pass http://127.0.0.1:5000/airbnb-onepage/;
+    }
+
+    # Serve static files from the specified directory
+    location /hbnb_static/ {
+        alias /data/web_static/current/;
+    }
+
+    # Define the location block for the default route
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+# Additional server block (commented out for simplicity)
+# Uncomment and modify as needed for virtual hosts
+# server {
+#     listen 80;
+#     listen [::]:80;
+#
+#     server_name example.com;
+#
+#     root /var/www/example.com;
+#     index index.html;
+#
+#     location / {
+#         try_files $uri $uri/ =404;
+#     }
+# }
